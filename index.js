@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const app = express();
 const port = 8200;
@@ -9,7 +10,7 @@ var conn = new jsforce.Connection({
   loginUrl: "https://login.salesforce.com/",
 });
 
-conn.login("cchilds@dentalintel.com", "iMoved2005!", function (err, userInfo) {
+conn.login(process.env.SF_USERNAME, process.env.SF_PASSWORD, function (err, userInfo) {
   if (err) {
     return console.error(err);
   }
