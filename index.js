@@ -12,4 +12,4 @@ app.get("/api/test2", (req, res) => {
     res.status(200).send("Working two")
 })
 
-app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+app.listen(port, () => console.log(`Listening on ${port}`));
