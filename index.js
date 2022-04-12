@@ -5,6 +5,7 @@ const app = express();
 const port = 8200;
 const jsforce = require("jsforce");
 const urlBuilder = require("./controllers/url-builder");
+const snapshot = require("./controllers/snapshot");
 app.use(express.json());
 app.use(cors())
 
@@ -35,5 +36,6 @@ conn.login(
 );
 
 app.post("/api/shortenUrl", urlBuilder.createMarketingUrl);
+app.post("/api/sendSnapshot", snapshot.sendSnapshot);
 
 app.listen(port, () => console.log(`Listening on ${port}`));
