@@ -1,3 +1,6 @@
+const CircularJSON = require("circular-json");
+const axios = require("axios");
+
 module.exports = {
     sendSnapshot: (req, res) => {
         axios
@@ -5,7 +8,7 @@ module.exports = {
           .then((zapResponse) => {
             console.log(zapResponse)
             let json = CircularJSON.stringify(zapResponse);
-            res.status(200).send(req.body);
+            res.status(200).send(json);
           });
       },
 }
