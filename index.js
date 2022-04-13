@@ -46,4 +46,4 @@ app.post("/api/shortenUrl", urlBuilder.createMarketingUrl);
 // SNAPSHOT ROUTE
 app.post("/api/sendSnapshot", snapshot.sendSnapshot);
 // PAGE CREATION ROUTES
-app.get("/api/addPartner", partnerCreation.addPartner);
+app.post("/api/addPartner", partnerCreation.addPartner);
