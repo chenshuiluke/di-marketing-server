@@ -4,7 +4,7 @@ const Partner = require("./../models/partner");
 
 module.exports = {
   addPartner: async (req, res) => {
-    const { partnerName, partnerLogo, campaignId, slashTag, destinationUrl } =
+    const { partnerName, partnerLogo, campaignId, slashTag, destinationUrl, pageType } =
       req.body;
 
     const headers = {
@@ -35,6 +35,7 @@ module.exports = {
         long_url: destinationUrl,
         short_url: link.shortUrl,
         campaign_id: campaignId,
+        page_type: pageType,
         visits: 0,
         submissions: 0,
       });
@@ -42,13 +43,39 @@ module.exports = {
       partner
         .save()
         .then((result) => {
-            res.status(200).send(link.shortUrl);
+          res.status(200).send(link.shortUrl);
         })
         .catch((err) => console.log(err));
 
       console.log(link.shortUrl);
     } catch (err) {
-      res.status(403).send(err);
+      if (err.response) {
+        res.status(200).send(err.response.data.errors[0].message);
+        console.log(err.response.data.errors[0].message);
+      } else {
+          console.log(err)
+      }
     }
+  },
+  getGrowthPartners: (req, res) => {
+    Partner.find({page_type: 'Growth Platform'})
+      .then((partners) => {
+        res.status(200).send(partners);
+      })
+      .catch((err) => console.log(err));
+  },
+  getOSPartners: (req, res) => {
+    Partner.find({page_type: 'LocalMed'})
+      .then((partners) => {
+        res.status(200).send(partners);
+      })
+      .catch((err) => console.log(err));
+  },
+  getModentoPartners: (req, res) => {
+    Partner.find({page_type: 'Modento'})
+      .then((partners) => {
+        res.status(200).send(partners);
+      })
+      .catch((err) => console.log(err));
   },
 };

@@ -47,3 +47,6 @@ app.post("/api/shortenUrl", urlBuilder.createMarketingUrl);
 app.post("/api/sendSnapshot", snapshot.sendSnapshot);
 // PAGE CREATION ROUTES
 app.post("/api/addPartner", partnerCreation.addPartner);
+app.get("/api/getGrowthPartners", partnerCreation.getGrowthPartners);
+app.get("/api/getOSPartners", partnerCreation.getOSPartners);
+app.get("/api/getModentoPartners", partnerCreation.getModentoPartners);
