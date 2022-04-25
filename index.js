@@ -5,9 +5,9 @@ const mongoose = require("mongoose");
 const app = express();
 const port = 8200;
 const urlBuilder = require("./controllers/url-builder");
-const partnerCreation = require('./controllers/partner_creation')
+const partnerCreation = require("./controllers/partner_creation");
 const snapshot = require("./controllers/snapshot");
-const { blogger } = require("googleapis/build/src/apis/blogger");
+const referral = require("./controllers/referral");
 app.use(express.json());
 app.use(cors());
 
@@ -17,6 +17,7 @@ mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
   .catch((err) => console.error(err));
+
 
 // var conn = new jsforce.Connection({
 //   // you can change loginUrl to connect to sandbox or prerelease env.
@@ -50,3 +51,8 @@ app.post("/api/addPartner", partnerCreation.addPartner);
 app.get("/api/getGrowthPartners", partnerCreation.getGrowthPartners);
 app.get("/api/getOSPartners", partnerCreation.getOSPartners);
 app.get("/api/getModentoPartners", partnerCreation.getModentoPartners);
+app.get("/api/getLinks", urlBuilder.getAllLinks)
+
+// CUSTOMER REFERRAL ROUTES
+
+app.get("/api/createReferralLink", referral.createReferralLink)

@@ -9,6 +9,7 @@ module.exports = {
       scopes: "https://www.googleapis.com/auth/spreadsheets",
     });
 
+
     const client = await auth.getClient();
     const googleSheets = google.sheets({
       version: "v4",
@@ -33,7 +34,7 @@ module.exports = {
       data: linkRequest,
       headers: headers,
     };
-    //
+    
 
     try {
       let apiResponse = await axios(apiCall);
@@ -54,4 +55,27 @@ module.exports = {
       res.status(403).send(err);
     }
   },
+
+  getAllLinks: async (req,res) => {
+    const headers = {
+      "Content-Type": "application/json",
+      apikey: process.env.REBRAND_API_KEY,
+    };
+
+    let endpoint = "https://api.rebrandly.com/v1/links";
+
+    const apiCall = {
+      method: "get",
+      url: endpoint,
+      headers: headers,
+    };
+
+    try {
+      let apiResponse = await axios(apiCall);
+      let link = apiResponse.data;
+      res.status(200).send(link)
+    } catch(err){
+      console.log(err)
+    }
+  }
 };
