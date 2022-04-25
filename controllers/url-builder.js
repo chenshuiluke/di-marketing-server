@@ -75,7 +75,12 @@ module.exports = {
       let link = apiResponse.data;
       res.status(200).send(link)
     } catch(err){
-      console.log(err)
+      if (err.response) {
+        res.status(200).send(err.response.data.errors[0].message);
+        console.log(err.response.data.errors[0].message);
+      } else {
+          console.log(err)
+      }
     }
   }
 };
