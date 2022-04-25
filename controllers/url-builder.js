@@ -9,7 +9,6 @@ module.exports = {
       scopes: "https://www.googleapis.com/auth/spreadsheets",
     });
 
-
     const client = await auth.getClient();
     const googleSheets = google.sheets({
       version: "v4",
@@ -34,7 +33,6 @@ module.exports = {
       data: linkRequest,
       headers: headers,
     };
-    
 
     try {
       let apiResponse = await axios(apiCall);
@@ -46,17 +44,29 @@ module.exports = {
         range: "url_list!A:D",
         valueInputOption: "USER_ENTERED",
         resource: {
-          values: [[req.body.campaignName, link.shortUrl, req.body.destinationUrl, req.body.utmContent]],
+          values: [
+            [
+              req.body.campaignName,
+              link.shortUrl,
+              req.body.destinationUrl,
+              req.body.utmContent,
+            ],
+          ],
         },
       });
       res.status(200).send(link.shortUrl);
       console.log(link.shortUrl);
     } catch (err) {
-      res.status(403).send(err);
+      if (err.response) {
+        res.status(200).send(err.response.data.errors[0].message);
+        console.log(err.response.data.errors[0].message);
+      } else {
+        console.log(err);
+      }
     }
   },
 
-  getAllLinks: async (req,res) => {
+  getAllLinks: async (req, res) => {
     const headers = {
       "Content-Type": "application/json",
       apikey: process.env.REBRAND_API_KEY,
@@ -73,14 +83,14 @@ module.exports = {
     try {
       let apiResponse = await axios(apiCall);
       let link = apiResponse.data;
-      res.status(200).send(link)
-    } catch(err){
+      res.status(200).send(link);
+    } catch (err) {
       if (err.response) {
         res.status(200).send(err.response.data.errors[0].message);
         console.log(err.response.data.errors[0].message);
       } else {
-          console.log(err)
+        console.log(err);
       }
     }
-  }
+  },
 };
