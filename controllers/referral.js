@@ -3,7 +3,7 @@ const axios = require("axios");
 
 module.exports = {
   createReferralLink: async (req, res) => {
-    const { utmCampaign, campaignId, slashTag } = req.body;
+    const { utmCampaign, campaignId, slashTag } = req.query;
 
     let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referrral`;
     const headers = {
