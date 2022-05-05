@@ -54,4 +54,4 @@ app.get("/api/getModentoPartners", partnerCreation.getModentoPartners);
 app.get("/api/getLinks", urlBuilder.getAllLinks)
 
 // CUSTOMER REFERRAL ROUTES
-app.get("/api/createReferralLink", referral.createReferralLink)
+app.post("/api/createReferralLink", referral.createReferralLink)
