@@ -29,7 +29,10 @@ module.exports = {
     try {
       let apiResponse = await axios(apiCall);
       let link = apiResponse.data;
-      res.status(200).send(link.shortUrl);
+      res.status(200).send({
+          link: link.shortUrl,
+          body: req.body
+      });
     } catch (err) {
       if (err.response) {
         res.status(200).send(err.response.data.errors[0].message);
