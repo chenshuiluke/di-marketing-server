@@ -3,9 +3,9 @@ const axios = require("axios");
 
 module.exports = {
   createReferralLink: async (req, res) => {
-    const { utmCampaign, campaignId, slashTag } = req.query;
+    const { utmCampaign, campaignId, slashTag, accountId } = req.query;
 
-    let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referrral`;
+    let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referrral&account_id=${accountId}`;
     const headers = {
       "Content-Type": "application/json",
       apikey: process.env.REBRAND_API_KEY,
@@ -15,7 +15,7 @@ module.exports = {
 
     let linkRequest = {
       destination: destinationUrl,
-      domain: { fullName: "getdentalintel.com" },
+      domain: { fullName: "get.dentalintel.net" },
       slashtag: slashTag,
     };
 
