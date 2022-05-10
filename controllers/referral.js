@@ -3,6 +3,7 @@ const axios = require("axios");
 
 module.exports = {
   createReferralLink: async (req, res) => {
+    var num = Math.floor(1000 + Math.random() * 9000);
     const { utmCampaign, campaignId, slashTag, accountId } = req.query;
 
     let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referrral&account_id=${accountId}`;
@@ -16,7 +17,7 @@ module.exports = {
     let linkRequest = {
       destination: destinationUrl,
       domain: { fullName: "get.dentalintel.net" },
-      slashtag: slashTag,
+      slashtag: slashTag + num,
     };
 
     const apiCall = {
