@@ -6,7 +6,7 @@ module.exports = {
     var num = Math.floor(Math.random() * 90 + 10)
     const { utmCampaign, campaignId, slashTag, accountId } = req.query;
 
-    let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referrral&account_id=${accountId}`;
+    let destinationUrl = `https://get.dentalintel.com/watch/?campaign_id=${campaignId}&utm_campaign=${utmCampaign}&utm_source=customer_referral&account_id=${accountId}`;
     const headers = {
       "Content-Type": "application/json",
       apikey: process.env.REBRAND_API_KEY,
