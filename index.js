@@ -48,9 +48,9 @@ app.post("/api/shortenUrl", urlBuilder.createMarketingUrl);
 app.post("/api/sendSnapshot", snapshot.sendSnapshot);
 // PAGE CREATION ROUTES
 app.post("/api/addPartner", partnerCreation.addPartner);
-app.get("/api/getGrowthPartners", partnerCreation.getGrowthPartners);
-app.get("/api/getOSPartners", partnerCreation.getOSPartners);
-app.get("/api/getModentoPartners", partnerCreation.getModentoPartners);
+app.get("/api/getEngagementPartners", partnerCreation.getEngagementPartners);
+app.get("/api/getAnalyticsPartners", partnerCreation.getAnalyticsPartners);
+app.get("/api/getBundlePartners", partnerCreation.getBundlePartners);
 app.get("/api/getLinks", urlBuilder.getAllLinks)
 
 // CUSTOMER REFERRAL ROUTES

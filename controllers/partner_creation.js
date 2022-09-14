@@ -57,22 +57,22 @@ module.exports = {
       }
     }
   },
-  getGrowthPartners: (req, res) => {
-    Partner.find({page_type: 'Growth Platform'})
+  getEngagementPartners: (req, res) => {
+    Partner.find({page_type: 'Engagement'})
       .then((partners) => {
         res.status(200).send(partners);
       })
       .catch((err) => console.log(err));
   },
-  getOSPartners: (req, res) => {
-    Partner.find({page_type: 'LocalMed'})
+  getAnalyticsPartners: (req, res) => {
+    Partner.find({page_type: 'Analytics'})
       .then((partners) => {
         res.status(200).send(partners);
       })
       .catch((err) => console.log(err));
   },
-  getModentoPartners: (req, res) => {
-    Partner.find({page_type: 'Modento'})
+  getBundlePartners: (req, res) => {
+    Partner.find({page_type: 'Bundle'})
       .then((partners) => {
         res.status(200).send(partners);
       })
