@@ -18,7 +18,6 @@ mongoose
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
   .catch((err) => console.error(err));
 
-
 // var conn = new jsforce.Connection({
 //   // you can change loginUrl to connect to sandbox or prerelease env.
 //   loginUrl: "https://login.salesforce.com/",
@@ -51,7 +50,11 @@ app.post("/api/addPartner", partnerCreation.addPartner);
 app.get("/api/getEngagementPartners", partnerCreation.getEngagementPartners);
 app.get("/api/getAnalyticsPartners", partnerCreation.getAnalyticsPartners);
 app.get("/api/getBundlePartners", partnerCreation.getBundlePartners);
-app.get("/api/getLinks", urlBuilder.getAllLinks)
+app.get(
+  "/api/getGrowthReportPartners",
+  partnerCreation.getGrowthReportPartners
+);
+app.get("/api/getLinks", urlBuilder.getAllLinks);
 
 // CUSTOMER REFERRAL ROUTES
-app.get("/api/createReferralLink", referral.createReferralLink)
+app.get("/api/createReferralLink", referral.createReferralLink);

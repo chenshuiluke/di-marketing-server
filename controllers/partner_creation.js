@@ -4,15 +4,26 @@ const Partner = require("./../models/partner");
 
 module.exports = {
   addPartner: async (req, res) => {
-    const { partnerName, partnerLogo, campaignId, slashTag, destinationUrl, pageType } =
-      req.body;
+    let {
+      partnerName,
+      partnerLogo,
+      campaignId,
+      slashTag,
+      destinationUrl,
+      pageType,
+    } = req.body;
 
     const headers = {
       "Content-Type": "application/json",
       apikey: process.env.REBRAND_API_KEY,
     };
     let endpoint = "https://api.rebrandly.com/v1/links";
-
+    if (process.env.NODE_ENV == "development") {
+      destinationUrl = destinationUrl.replace(
+        "https://www.dentalintel.com",
+        "https://di-marketing-site.webflow.io"
+      );
+    }
     let linkRequest = {
       destination: destinationUrl,
       domain: { fullName: "get.dentalintel.net" },
@@ -53,26 +64,33 @@ module.exports = {
         res.status(200).send(err.response.data.errors[0].message);
         console.log(err.response.data.errors[0].message);
       } else {
-          console.log(err)
+        console.log(err);
       }
     }
   },
   getEngagementPartners: (req, res) => {
-    Partner.find({page_type: 'Engagement'})
+    Partner.find({ page_type: "Engagement" })
       .then((partners) => {
         res.status(200).send(partners);
       })
       .catch((err) => console.log(err));
   },
   getAnalyticsPartners: (req, res) => {
-    Partner.find({page_type: 'Analytics'})
+    Partner.find({ page_type: "Analytics" })
       .then((partners) => {
         res.status(200).send(partners);
       })
       .catch((err) => console.log(err));
   },
   getBundlePartners: (req, res) => {
-    Partner.find({page_type: 'Bundle'})
+    Partner.find({ page_type: "Bundle (Engagement + Analytics)" })
+      .then((partners) => {
+        res.status(200).send(partners);
+      })
+      .catch((err) => console.log(err));
+  },
+  getGrowthReportPartners: (req, res) => {
+    Partner.find({ page_type: "Growth Report" })
       .then((partners) => {
         res.status(200).send(partners);
       })
