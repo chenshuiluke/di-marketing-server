@@ -28,7 +28,7 @@ module.exports = {
       destination: destinationUrl,
       domain: {
         fullName:
-          pageType != "LocalMed" ? "get.dentalintel.net" : "get.localmed.com",
+          pageType != "LocalMed" ? "get.dentalintel.net" : "getlocalmed.com",
       },
       slashtag: slashTag,
     };
