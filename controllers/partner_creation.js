@@ -96,4 +96,11 @@ module.exports = {
       })
       .catch((err) => console.log(err));
   },
+  getLocalMedPartners: (req, res) => {
+    Partner.find({ page_type: "LocalMed" })
+      .then((partners) => {
+        res.status(200).send(partners);
+      })
+      .catch((err) => console.log(err));
+  },
 };

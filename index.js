@@ -50,6 +50,7 @@ app.post("/api/addPartner", partnerCreation.addPartner);
 app.get("/api/getEngagementPartners", partnerCreation.getEngagementPartners);
 app.get("/api/getAnalyticsPartners", partnerCreation.getAnalyticsPartners);
 app.get("/api/getBundlePartners", partnerCreation.getBundlePartners);
+app.get("/api/getLocalMedPartners", partnerCreation.getLocalMedPartners);
 app.get(
   "/api/getGrowthReportPartners",
   partnerCreation.getGrowthReportPartners
