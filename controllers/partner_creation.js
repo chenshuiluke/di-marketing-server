@@ -26,7 +26,10 @@ module.exports = {
     }
     let linkRequest = {
       destination: destinationUrl,
-      domain: { fullName: "get.dentalintel.net" },
+      domain: {
+        fullName:
+          pageType != "LocalMed" ? "get.dentalintel.net" : "get.localmed.com",
+      },
       slashtag: slashTag,
     };
 
