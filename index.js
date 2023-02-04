@@ -103,7 +103,7 @@ app.get("/api/tags", async (req, res, next) => {
             item["tag-dropdown"] != null &&
             Array.isArray(item["tag-dropdown"])
           ) {
-            tagMap[item.name] = item["tag-dropdown"].map((tagId) => {
+            tagMap[item.name.trim()] = item["tag-dropdown"].map((tagId) => {
               return tagIdNameMap[tagId];
             });
           }
