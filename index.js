@@ -72,18 +72,19 @@ app.get("/api/tags", async (req, res, next) => {
       const apiKey = process.env.API_KEY;
       const siteId = "6266d8ef8c92b1230d1e0cbb";
       const webflow = new Webflow({ token: apiKey });
-      const resourceTagCollectionId = "63d0230e5f82552be2fede80";
+      const resourceTagCollectionId = "63ec21ad068777b053fbae35";
       const site = await webflow.site({
         siteId: siteId,
       });
       const collections = await site.collections();
-      // console.log(collections);
+      console.log(collections);
+      // process.exit(0);
       const collectionIds = [
-        "63d7c5b7639bac4c0ee20ec5", // Ebook
-        "639f79531caa80c3bc3c1642", //Blog
-        "639f79531caa805a773c1641", //Webinar
-        "63d7f65be924356771d1f865", //Testimonial
-        "639f79531caa80e8fb3c1640", // Podcast
+        "63ec21ad0687778cfffbae36", // Ebook
+        "63ec21ad068777fbe9fbae33", //Blog
+        "63ec21ad068777049bfbae30", //Webinar
+        "63ec21ad0687771dfdfbae37", //Testimonial
+        "63ec21ad068777c4effbae34", // Podcast
       ];
       const tags = await webflow.items({
         collectionId: resourceTagCollectionId,
@@ -98,6 +99,10 @@ app.get("/api/tags", async (req, res, next) => {
         });
         // console.log(items);
         for (const item of items) {
+          if (item?.name?.includes("3")) {
+            console.log("@@@ item", item);
+          }
+
           if (
             item != null &&
             item["tag-dropdown"] != null &&
@@ -109,7 +114,7 @@ app.get("/api/tags", async (req, res, next) => {
           }
         }
       }
-      // console.log(tagMap);
+      console.log(tagMap);
     } catch (e) {
       // Deal with the fact the chain failed
       console.error(e);
