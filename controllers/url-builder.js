@@ -37,23 +37,26 @@ module.exports = {
     try {
       let apiResponse = await axios(apiCall);
       let link = apiResponse.data;
-
-      await googleSheets.spreadsheets.values.append({
-        auth,
-        spreadsheetId,
-        range: "url_list!A:D",
-        valueInputOption: "USER_ENTERED",
-        resource: {
-          values: [
-            [
-              req.body.campaignName,
-              link.shortUrl,
-              req.body.destinationUrl,
-              req.body.utmContent,
+      try {
+        await googleSheets.spreadsheets.values.append({
+          auth,
+          spreadsheetId,
+          range: "url_list!A:D",
+          valueInputOption: "USER_ENTERED",
+          resource: {
+            values: [
+              [
+                req.body.campaignName,
+                link.shortUrl,
+                req.body.destinationUrl,
+                req.body.utmContent,
+              ],
             ],
-          ],
-        },
-      });
+          },
+        });
+      } catch (err) {
+        console.error(err);
+      }
       res.status(200).send(link.shortUrl);
       console.log(link.shortUrl);
     } catch (err) {
