@@ -57,11 +57,10 @@ module.exports = {
       res.status(200).send(link.shortUrl);
       console.log(link.shortUrl);
     } catch (err) {
+      console.log(JSON.stringify(err));
       if (err.response) {
-        res.status(200).send(err.response.data.errors[0].message);
-        console.log(err.response.data.errors[0].message);
-      } else {
-        console.log(err);
+        res.status(200).send(err?.response?.data?.errors?.[0]?.message);
+        console.log(err?.response?.data?.errors?.[0]?.message);
       }
     }
   },
