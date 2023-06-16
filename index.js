@@ -10,6 +10,7 @@ const snapshot = require("./controllers/snapshot");
 const referral = require("./controllers/referral");
 const { setIntervalAsync, clearIntervalAsync } = require("set-interval-async");
 const Webflow = require("webflow-api");
+const moment = require("moment");
 app.use(express.json());
 app.use(cors());
 
@@ -66,12 +67,169 @@ app.get("/api/tags", async (req, res, next) => {
   return res.json(tagMap);
 });
 
+app.get("/api/resources/", async (req, res, next) => {
+  return res.json(sortedResources);
+});
+
+app.get("/api/resources/first-six", async (req, res, next) => {
+  return res.json(first6Resources);
+});
+
+const collectionIdMap = {
+  ebook: "63ec21ad0687778cfffbae36",
+  blog: "63ec21ad068777fbe9fbae33",
+  webinar: "63ec21ad068777049bfbae30",
+  testimonial: "63ec21ad0687771dfdfbae37",
+  podcast: "63ec21ad068777c4effbae34",
+};
+
+let first6Resources = [];
+let sortedResources = [];
+
+const getAllFromCollection = async (webflow, collectionId) => {
+  let allItems = [];
+  let latestItems = [];
+  let offset = 0;
+  let limit = 100;
+  do {
+    const responseItems = await webflow.items({ collectionId, limit, offset });
+    latestItems = responseItems;
+    allItems = allItems.concat(latestItems);
+    offset += latestItems.length;
+  } while (latestItems.length != 0);
+  return allItems;
+};
+
+const getEbooks = async (webflow) => {
+  const ebooksResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.ebook
+  );
+  const ebooks = ebooksResponse.map((ebook) => {
+    return {
+      id: ebook._id,
+      title: ebook?.name,
+      image: ebook?.thumbnail?.url,
+      description: ebook?.description,
+      tags: ebook?.["tag-dropdown"],
+      date: ebook?.["updated-on"],
+      link: `/ebooks/${ebook?.slug}`,
+      contentType: "ebook",
+    };
+  });
+  console.log("@@@", ebooks);
+  return ebooks;
+};
+
+const getWebinars = async (webflow) => {
+  const webinarsResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.webinar
+  );
+  const webinars = webinarsResponse.map((webinar) => {
+    return {
+      id: webinar._id,
+      title: webinar?.name,
+      image: webinar?.thumbnail?.url,
+      description: webinar?.["meta-description"],
+      tags: webinar?.["tag-dropdown"],
+      date: webinar?.["updated-on"],
+      link: `/webinars/${webinar?.slug}`,
+      contentType: "webinar",
+    };
+  });
+  console.log("@@@", webinars);
+  return webinars;
+};
+
+const getPodcasts = async (webflow) => {
+  const podcastResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.podcast
+  );
+  const podcasts = podcastResponse.map((podcast) => {
+    return {
+      id: podcast._id,
+      title: podcast?.name,
+      image: podcast?.thumbnail?.url,
+      description: podcast?.["meta-description"],
+      tags: podcast?.["tag-dropdown"],
+      date: podcast?.["updated-on"],
+      link: `/podcasts/${podcast?.slug}`,
+      contentType: "podcast",
+    };
+  });
+  console.log("@@@", podcasts);
+  return podcasts;
+};
+
+const getBlogs = async (webflow) => {
+  const blogResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.blog
+  );
+  const blogs = blogResponse.map((blog) => {
+    return {
+      id: blog._id,
+      title: blog?.name,
+      image: blog?.["featured-image-url"]?.url,
+      description: blog?.["meta-description"],
+      tags: blog?.["tag-dropdown"],
+      date: blog?.["updated-on"],
+      link: `/podcasts/${blog?.slug}`,
+      contentType: "blog",
+    };
+  });
+  console.log("@@@", blogs);
+  return blogs;
+};
+
+const getTestimonials = async (webflow) => {
+  const testimonialResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.testimonial
+  );
+  const testimonials = testimonialResponse.map((testimonial) => {
+    return {
+      id: testimonial._id,
+      title: testimonial?.name,
+      image: testimonial?.thumbnail?.url,
+      description: testimonial?.["meta-description"],
+      tags: testimonial?.["tag-dropdown"],
+      date: testimonial?.["updated-on"],
+      link: `/podcasts/${testimonial?.slug}`,
+    };
+  });
+  console.log("@@@", testimonials);
+  return testimonials;
+};
+
 (async () => {
   setIntervalAsync(async () => {
     try {
       const apiKey = process.env.API_KEY;
       const siteId = "6266d8ef8c92b1230d1e0cbb";
       const webflow = new Webflow({ token: apiKey });
+      const ebooks = await getEbooks(webflow);
+      const webinars = await getWebinars(webflow);
+      const blogs = await getBlogs(webflow);
+      const podcasts = await getPodcasts(webflow);
+      const testimonials = await getTestimonials(webflow);
+      const allContent = [
+        ...ebooks,
+        ...webinars,
+        ...blogs,
+        ...podcasts,
+        ...testimonials,
+      ];
+      const sortedContent = allContent.sort((a, b) => {
+        return (
+          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
+        );
+      });
+
+      sortedResources = sortedContent;
+      first6Resources = sortedResources.slice(0, 6);
       const resourceTagCollectionId = "63ec21ad068777b053fbae35";
       const site = await webflow.site({
         siteId: siteId,
