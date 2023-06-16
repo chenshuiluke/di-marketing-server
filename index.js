@@ -156,6 +156,7 @@ const getWebinars = async (webflow) => {
       link: `/webinars/${webinar?.slug}`,
       contentType: "webinar",
       tags: getTags(webinar),
+      author: webinar?.["ce-credits"],
     };
   });
   console.log("@@@", webinars);
@@ -178,6 +179,8 @@ const getPodcasts = async (webflow) => {
       link: `/podcasts/${podcast?.slug}`,
       contentType: "podcast",
       tags: getTags(podcast),
+      author: podcast?.series,
+      episode: podcast?.["episode-number"],
     };
   });
   console.log("@@@", podcasts);
@@ -197,9 +200,10 @@ const getBlogs = async (webflow) => {
       description: blog?.["meta-description"],
       tags: blog?.["tag-dropdown"],
       date: blog?.["updated-on"],
-      link: `/podcasts/${blog?.slug}`,
+      link: `/blog-posts/${blog?.slug}`,
       contentType: "blog",
       tags: getTags(blog),
+      author: blog?.author,
     };
   });
   console.log("@@@", blogs);
@@ -219,7 +223,8 @@ const getTestimonials = async (webflow) => {
       description: testimonial?.["quote"],
       tags: testimonial?.["tag-dropdown"],
       date: testimonial?.["updated-on"],
-      link: `/podcasts/${testimonial?.slug}`,
+      link: `/testimonials/${testimonial?.slug}`,
+      contentType: "testimonial",
       tags: getTags(testimonial),
     };
   });
@@ -294,7 +299,14 @@ const getTestimonials = async (webflow) => {
           moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
         );
       });
-      sortedResources = sortedContent;
+      sortedResources = sortedContent.map((record) => {
+        return {
+          ...record,
+          ...(record?.date != null && {
+            date: moment(record.date).format("MM D, YYYY"),
+          }),
+        };
+      });
       first6Resources = sortedResources.slice(0, 6);
     } catch (e) {
       // Deal with the fact the chain failed
