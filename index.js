@@ -214,7 +214,7 @@ const getTestimonials = async (webflow) => {
       id: testimonial._id,
       title: testimonial?.name,
       image: testimonial?.thumbnail?.url,
-      description: testimonial?.["meta-description"],
+      description: testimonial?.["quote"],
       tags: testimonial?.["tag-dropdown"],
       date: testimonial?.["updated-on"],
       link: `/podcasts/${testimonial?.slug}`,
