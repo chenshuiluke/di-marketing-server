@@ -16,6 +16,7 @@ app.use(cors());
 
 const dbURI = process.env.DB_URI;
 const tagMap = {};
+const tagIdNameMap = {};
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -86,6 +87,21 @@ const collectionIdMap = {
 let first6Resources = [];
 let sortedResources = [];
 
+const getTags = (resource) => {
+  if (resource.tags != null) {
+    return resource.tags;
+  }
+  const tags = resource?.["tag-dropdown"]
+    ?.filter((tagId) => {
+      return tagIdNameMap[tagId] != null;
+    })
+    .map((tagId) => tagIdNameMap[tagId]?.toLowerCase());
+  if (tags?.length > 0) {
+    return tags.join(" ");
+  }
+  return "";
+};
+
 const getAllFromCollection = async (webflow, collectionId) => {
   let allItems = [];
   let latestItems = [];
@@ -115,6 +131,7 @@ const getEbooks = async (webflow) => {
       date: ebook?.["updated-on"],
       link: `/ebooks/${ebook?.slug}`,
       contentType: "ebook",
+      tags: getTags(ebook),
     };
   });
   console.log("@@@", ebooks);
@@ -136,6 +153,7 @@ const getWebinars = async (webflow) => {
       date: webinar?.["updated-on"],
       link: `/webinars/${webinar?.slug}`,
       contentType: "webinar",
+      tags: getTags(webinar),
     };
   });
   console.log("@@@", webinars);
@@ -157,6 +175,7 @@ const getPodcasts = async (webflow) => {
       date: podcast?.["updated-on"],
       link: `/podcasts/${podcast?.slug}`,
       contentType: "podcast",
+      tags: getTags(podcast),
     };
   });
   console.log("@@@", podcasts);
@@ -178,6 +197,7 @@ const getBlogs = async (webflow) => {
       date: blog?.["updated-on"],
       link: `/podcasts/${blog?.slug}`,
       contentType: "blog",
+      tags: getTags(blog),
     };
   });
   console.log("@@@", blogs);
@@ -198,6 +218,7 @@ const getTestimonials = async (webflow) => {
       tags: testimonial?.["tag-dropdown"],
       date: testimonial?.["updated-on"],
       link: `/podcasts/${testimonial?.slug}`,
+      tags: getTags(testimonial),
     };
   });
   console.log("@@@", testimonials);
@@ -210,26 +231,7 @@ const getTestimonials = async (webflow) => {
       const apiKey = process.env.API_KEY;
       const siteId = "6266d8ef8c92b1230d1e0cbb";
       const webflow = new Webflow({ token: apiKey });
-      const ebooks = await getEbooks(webflow);
-      const webinars = await getWebinars(webflow);
-      const blogs = await getBlogs(webflow);
-      const podcasts = await getPodcasts(webflow);
-      const testimonials = await getTestimonials(webflow);
-      const allContent = [
-        ...ebooks,
-        ...webinars,
-        ...blogs,
-        ...podcasts,
-        ...testimonials,
-      ];
-      const sortedContent = allContent.sort((a, b) => {
-        return (
-          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
-        );
-      });
 
-      sortedResources = sortedContent;
-      first6Resources = sortedResources.slice(0, 6);
       const resourceTagCollectionId = "63ec21ad068777b053fbae35";
       const site = await webflow.site({
         siteId: siteId,
@@ -247,7 +249,6 @@ const getTestimonials = async (webflow) => {
       const tags = await webflow.items({
         collectionId: resourceTagCollectionId,
       });
-      const tagIdNameMap = {};
       for (const tag of tags) {
         tagIdNameMap[tag._id] = tag.name;
       }
@@ -273,6 +274,26 @@ const getTestimonials = async (webflow) => {
         }
       }
       console.log(tagMap);
+
+      const ebooks = await getEbooks(webflow);
+      const webinars = await getWebinars(webflow);
+      const blogs = await getBlogs(webflow);
+      const podcasts = await getPodcasts(webflow);
+      const testimonials = await getTestimonials(webflow);
+      const allContent = [
+        ...ebooks,
+        ...webinars,
+        ...blogs,
+        ...podcasts,
+        ...testimonials,
+      ];
+      const sortedContent = allContent.sort((a, b) => {
+        return (
+          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
+        );
+      });
+      sortedResources = sortedContent;
+      first6Resources = sortedResources.slice(0, 6);
     } catch (e) {
       // Deal with the fact the chain failed
       console.error(e);
