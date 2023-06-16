@@ -113,7 +113,9 @@ const getAllFromCollection = async (webflow, collectionId) => {
     allItems = allItems.concat(latestItems);
     offset += latestItems.length;
   } while (latestItems.length != 0);
-  return allItems;
+  return allItems.filter((item) => {
+    return !item._archived && !item._draft;
+  });
 };
 
 const getEbooks = async (webflow) => {
