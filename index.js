@@ -303,7 +303,7 @@ const getTestimonials = async (webflow) => {
         return {
           ...record,
           ...(record?.date != null && {
-            date: moment(record.date).format("MM D, YYYY"),
+            date: moment(record.date).format("MMM D, YYYY"),
           }),
         };
       });
