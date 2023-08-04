@@ -17,6 +17,7 @@ app.use(cors());
 const dbURI = process.env.DB_URI;
 const tagMap = {};
 const tagIdNameMap = {};
+const serviceTypeIdNameMap = {};
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -72,6 +73,13 @@ app.get("/api/resources/", async (req, res, next) => {
   return res.json(sortedResources);
 });
 
+app.get("/api/certified-partners/", async (req, res, next) => {
+  return res.json({
+    goldPartners,
+    diamondPartners,
+  });
+});
+
 app.get("/api/resources/first-six", async (req, res, next) => {
   return res.json(first6Resources);
 });
@@ -82,10 +90,14 @@ const collectionIdMap = {
   webinar: "63ec21ad068777049bfbae30",
   testimonial: "63ec21ad0687771dfdfbae37",
   podcast: "63ec21ad068777c4effbae34",
+  partner: "64bec95d1d0799a80325f918",
 };
 
 let first6Resources = [];
 let sortedResources = [];
+
+let diamondPartners = [];
+let goldPartners = [];
 
 const getTags = (resource) => {
   if (resource.tags != null) {
@@ -102,6 +114,29 @@ const getTags = (resource) => {
   return "";
 };
 
+const getServiceTypes = (partner) => {
+  const tags = partner?.["services"]
+    ?.filter((serviceId) => {
+      return serviceTypeIdNameMap[serviceId] != null;
+    })
+    .map((tagId) => serviceTypeIdNameMap[tagId]?.toLowerCase());
+  if (tags?.length > 0) {
+    return tags.join(" ");
+  }
+  return "";
+};
+
+const getTier = (partner) => {
+  const goldTierId = "6429739f9eb18ef372a572a04cfaa588";
+  const diamondTierId = "c5a4718d254b82a56f60d5d6856e3a30";
+  if (partner?.["partner-tier"] == goldTierId) {
+    return "gold";
+  }
+  if (partner?.["partner-tier"] == diamondTierId) {
+    return "diamond";
+  }
+};
+
 const getAllFromCollection = async (webflow, collectionId) => {
   let allItems = [];
   let latestItems = [];
@@ -116,6 +151,31 @@ const getAllFromCollection = async (webflow, collectionId) => {
   return allItems.filter((item) => {
     return !item._archived && !item._draft;
   });
+};
+
+const getCertifiedPartners = async (webflow) => {
+  const partnerResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.partner
+  );
+  const partners = partnerResponse.map((partner) => {
+    return {
+      id: partner._id,
+      title: partner?.name,
+      image: partner?.["partner-image"]?.url,
+      description: partner?.description,
+      tier: getTier(partner),
+      isTopPerformer: partner?.["is-top-performer"],
+      partnerWebsite: partner?.["partner-website"],
+      topPerformerCategory: partner?.["top-performer-category"],
+      date: partner?.["updated-on"],
+      link: `/ebooks/${partner?.slug}`,
+      contentType: "partner",
+      services: getServiceTypes(partner),
+    };
+  });
+  console.log("@@@", partners);
+  return partners;
 };
 
 const getEbooks = async (webflow) => {
@@ -253,9 +313,30 @@ const getTestimonials = async (webflow) => {
         "63ec21ad0687771dfdfbae37", //Testimonial
         "63ec21ad068777c4effbae34", // Podcast
       ];
+      const certifiedPartnerServiceTypesCollectionId =
+        "64bec9d0d9be11ef02b7dab3";
+      const certifiedPartnerCollectionId = "64bec95d1d0799a80325f918";
+
+      const serviceTypes = await webflow.items({
+        collectionId: certifiedPartnerServiceTypesCollectionId,
+      });
+
+      for (const serviceType of serviceTypes) {
+        serviceTypeIdNameMap[serviceType._id] = serviceType.name;
+      }
+      const certifiedPartners = await getCertifiedPartners(webflow);
+
+      goldPartners = certifiedPartners.filter(
+        (partner) => partner.tier === "gold"
+      );
+      diamondPartners = certifiedPartners.filter(
+        (partner) => partner.tier === "diamond"
+      );
+
       const tags = await webflow.items({
         collectionId: resourceTagCollectionId,
       });
+
       for (const tag of tags) {
         tagIdNameMap[tag._id] = tag.name;
       }
