@@ -163,7 +163,7 @@ const getCertifiedPartners = async (webflow) => {
       id: partner._id,
       title: partner?.name,
       image: partner?.["partner-image"]?.url,
-      description: partner?.description,
+      description: partner?.["description-2"],
       tier: getTier(partner),
       isTopPerformer: partner?.["is-top-performer"],
       partnerWebsite: partner?.["partner-website"],
