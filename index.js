@@ -176,7 +176,7 @@ const getCertifiedPartners = async (webflow) => {
       partnerWebsite: partner?.["partner-website"],
       topPerformerCategory: partner?.["top-performer-category"],
       date: partner?.["updated-on"],
-      link: `/ebooks/${partner?.slug}`,
+      link: `/certified-partners/${partner?.slug}`,
       contentType: "partner",
       services: getServiceTypes(partner),
     };
