@@ -18,6 +18,7 @@ const dbURI = process.env.DB_URI;
 const tagMap = {};
 const tagIdNameMap = {};
 const serviceTypeIdNameMap = {};
+let serviceTypeList = [];
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -77,6 +78,12 @@ app.get("/api/certified-partners/", async (req, res, next) => {
   return res.json({
     goldPartners,
     diamondPartners,
+  });
+});
+
+app.get("/api/certified-partners/service-types", async (req, res, next) => {
+  return res.json({
+    serviceTypes: serviceTypeList,
   });
 });
 
@@ -320,9 +327,10 @@ const getTestimonials = async (webflow) => {
       const serviceTypes = await webflow.items({
         collectionId: certifiedPartnerServiceTypesCollectionId,
       });
-
+      serviceTypeList = [];
       for (const serviceType of serviceTypes) {
         serviceTypeIdNameMap[serviceType._id] = serviceType.name;
+        serviceTypeList.push(serviceType.name);
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
