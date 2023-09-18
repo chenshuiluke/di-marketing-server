@@ -17,8 +17,11 @@ app.use(cors());
 const dbURI = process.env.DB_URI;
 const tagMap = {};
 const tagIdNameMap = {};
+const featureIdNameMap = {};
 const serviceTypeIdNameMap = {};
 let serviceTypeList = [];
+let featureList = [];
+let productWebinarList = [];
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -91,6 +94,10 @@ app.get("/api/resources/first-six", async (req, res, next) => {
   return res.json(first6Resources);
 });
 
+app.get("/api/product-webinars", async (req, res, next) => {
+  return res.json(productWebinarList);
+});
+
 const collectionIdMap = {
   ebook: "63ec21ad0687778cfffbae36",
   blog: "63ec21ad068777fbe9fbae33",
@@ -98,6 +105,9 @@ const collectionIdMap = {
   testimonial: "63ec21ad0687771dfdfbae37",
   podcast: "63ec21ad068777c4effbae34",
   partner: "64bec95d1d0799a80325f918",
+  productWebinar: "6508490b2d27c5402795c54e",
+  services: "64bec9d0d9be11ef02b7dab3",
+  proofFeatures: "63ec21ad0687773eccfbae38",
 };
 
 let first6Resources = [];
@@ -117,6 +127,21 @@ const getTags = (resource) => {
     .map((tagId) => tagIdNameMap[tagId]?.toLowerCase());
   if (tags?.length > 0) {
     return tags.join(" ");
+  }
+  return "";
+};
+
+const getProductWebinarFeatures = (resource) => {
+  if (resource.tags != null) {
+    return resource.tags;
+  }
+  const features = resource?.["features"]
+    ?.filter((id) => {
+      return featureIdNameMap[id] != null;
+    })
+    .map((id) => featureIdNameMap[id]?.toLowerCase());
+  if (features?.length > 0) {
+    return features.join(" ");
   }
   return "";
 };
@@ -228,6 +253,43 @@ const getWebinars = async (webflow) => {
   });
   console.log("@@@", webinars);
   return webinars;
+};
+
+const getProductWebinars = async (webflow) => {
+  const webinarsResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.productWebinar
+  );
+
+  const webinars = webinarsResponse.map(async (webinar) => {
+    // const item = await webflow.item({
+    //   collectionId: collectionIdMap.productWebinar,
+    //   itemId: webinar._id,
+    // });
+    const moduleIdMap = {
+      "8a06ae32566bcc0d84489c27a5e92f82": "insurance",
+      caf5fd2abdc15a2a8a450a055a17049b: "monthly product webinar",
+      fa5dd3b71d7fc53ee12aea90b49aa256: "localmed",
+      "5cdce68b9bd6d3973075188dc4fb7b0c": "analytics",
+      "46ba10a9bac64b7e99d5ca81fc8ec534": "engagement",
+    };
+    return {
+      id: webinar._id,
+      title: webinar?.name,
+      image: webinar?.thumbnail?.url,
+      description: webinar?.["meta-description"],
+      tags: webinar?.["tag-dropdown"],
+      date: webinar?.["created-date"],
+      link: `/product-webinars/${webinar?.slug}`,
+      contentType: "webinar",
+      tags: getProductWebinarFeatures(webinar),
+      author: webinar?.["ce-credits"],
+      module: moduleIdMap[webinar?.["module"]]?.toLowerCase(),
+    };
+  });
+  const results = await Promise.all(webinars);
+  console.log("@@@", results);
+  return results;
 };
 
 const getPodcasts = async (webflow) => {
@@ -348,6 +410,15 @@ const getTestimonials = async (webflow) => {
       for (const tag of tags) {
         tagIdNameMap[tag._id] = tag.name;
       }
+
+      const features = await webflow.items({
+        collectionId: collectionIdMap.proofFeatures,
+      });
+      featureList = [];
+      for (const feature of features) {
+        featureIdNameMap[feature._id] = feature.name;
+        featureList.push(feature);
+      }
       for (const collectionId of collectionIds) {
         const items = await webflow.items({
           collectionId: collectionId,
@@ -376,6 +447,7 @@ const getTestimonials = async (webflow) => {
       const blogs = await getBlogs(webflow);
       const podcasts = await getPodcasts(webflow);
       const testimonials = await getTestimonials(webflow);
+      const productWebinars = await getProductWebinars(webflow);
       const allContent = [
         ...ebooks,
         ...webinars,
@@ -389,6 +461,19 @@ const getTestimonials = async (webflow) => {
         );
       });
       sortedResources = sortedContent.map((record) => {
+        return {
+          ...record,
+          ...(record?.date != null && {
+            date: moment(record.date).format("MMM D, YYYY"),
+          }),
+        };
+      });
+      const sortedProductWebinars = productWebinars.sort((a, b) => {
+        return (
+          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
+        );
+      });
+      productWebinarList = sortedProductWebinars.map((record) => {
         return {
           ...record,
           ...(record?.date != null && {
