@@ -290,7 +290,7 @@ const getProductWebinars = async (webflow) => {
     if (webinar?.["module-multiselect"] != null) {
       for (const moduleId of webinar["module-multiselect"]) {
         const module = webinarModuleNameMap[moduleId];
-        result.module += ` ${module?.name}`;
+        result.module += ` ${module}`;
       }
     }
     return result;
