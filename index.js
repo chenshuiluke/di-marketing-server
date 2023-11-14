@@ -19,6 +19,7 @@ const tagMap = {};
 const tagIdNameMap = {};
 const featureIdNameMap = {};
 const serviceTypeIdNameMap = {};
+const webinarModuleNameMap = {};
 let serviceTypeList = [];
 let featureList = [];
 let productWebinarList = [];
@@ -268,12 +269,12 @@ const getProductWebinars = async (webflow) => {
     // });
     const moduleIdMap = {
       "8a06ae32566bcc0d84489c27a5e92f82": "insurance",
-      caf5fd2abdc15a2a8a450a055a17049b: "monthly product webinar",
+      caf5fd2abdc15a2a8a450a055a17049b: "monthly product webinars",
       fa5dd3b71d7fc53ee12aea90b49aa256: "localmed",
       "5cdce68b9bd6d3973075188dc4fb7b0c": "analytics",
       "46ba10a9bac64b7e99d5ca81fc8ec534": "engagement",
     };
-    return {
+    const result = {
       id: webinar._id,
       title: webinar?.name,
       image: webinar?.thumbnail?.url,
@@ -286,6 +287,13 @@ const getProductWebinars = async (webflow) => {
       author: webinar?.["ce-credits"],
       module: moduleIdMap[webinar?.["module"]]?.toLowerCase(),
     };
+    if (webinar?.["module-multiselect"] != null) {
+      for (const moduleId of webinar["module-multiselect"]) {
+        const module = webinarModuleNameMap[moduleId];
+        result.module += ` ${module?.name}`;
+      }
+    }
+    return result;
   });
   const results = await Promise.all(webinars);
   console.log("@@@", results);
@@ -385,14 +393,23 @@ const getTestimonials = async (webflow) => {
       const certifiedPartnerServiceTypesCollectionId =
         "64bec9d0d9be11ef02b7dab3";
       const certifiedPartnerCollectionId = "64bec95d1d0799a80325f918";
+      const webinarModuleCollectionId = "65539140694b580e20191db8";
 
       const serviceTypes = await webflow.items({
         collectionId: certifiedPartnerServiceTypesCollectionId,
+      });
+
+      const webinarModuleMultiselect = await webflow.items({
+        collectionId: webinarModuleCollectionId,
       });
       serviceTypeList = [];
       for (const serviceType of serviceTypes) {
         serviceTypeIdNameMap[serviceType._id] = serviceType.name;
         serviceTypeList.push(serviceType.name);
+      }
+
+      for (const webinarModule of webinarModuleMultiselect) {
+        webinarModuleNameMap[webinarModule._id] = webinarModule.name;
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
