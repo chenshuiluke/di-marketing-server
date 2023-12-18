@@ -438,7 +438,7 @@ const getTestimonials = async (webflow) => {
       desiredOutcomesList = [];
       for (const desiredOutcome of desiredOutcomes) {
         desiredOutcomeNameMap[desiredOutcome._id] = desiredOutcome.name;
-        desiredOutcomesList.push(desiredOutcome.name);
+        desiredOutcomesList.push(desiredOutcome.name?.toLowerCase());
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
