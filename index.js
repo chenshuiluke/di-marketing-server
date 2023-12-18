@@ -24,6 +24,7 @@ const desiredOutcomeNameMap = {};
 let serviceTypeList = [];
 let featureList = [];
 let productWebinarList = [];
+let desiredOutcomesList = [];
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -98,6 +99,10 @@ app.get("/api/resources/first-six", async (req, res, next) => {
 
 app.get("/api/product-webinars", async (req, res, next) => {
   return res.json(productWebinarList);
+});
+
+app.get("/api/desired-outcomes", async (req, res, next) => {
+  return res.json(desiredOutcomesList);
 });
 
 const collectionIdMap = {
@@ -430,9 +435,10 @@ const getTestimonials = async (webflow) => {
       for (const webinarModule of webinarModuleMultiselect) {
         webinarModuleNameMap[webinarModule._id] = webinarModule.name;
       }
-
+      desiredOutcomesList = [];
       for (const desiredOutcome of desiredOutcomes) {
         desiredOutcomeNameMap[desiredOutcome._id] = desiredOutcome.name;
+        desiredOutcomesList.push(desiredOutcome.name);
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
