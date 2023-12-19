@@ -281,10 +281,6 @@ const getProductWebinars = async (webflow) => {
   );
 
   const webinars = webinarsResponse.map(async (webinar) => {
-    // const item = await webflow.item({
-    //   collectionId: collectionIdMap.productWebinar,
-    //   itemId: webinar._id,
-    // });
     const moduleIdMap = {
       "8a06ae32566bcc0d84489c27a5e92f82": "insurance",
       caf5fd2abdc15a2a8a450a055a17049b: "monthly product webinars",
