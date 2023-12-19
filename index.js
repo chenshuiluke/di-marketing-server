@@ -379,7 +379,7 @@ const getTestimonials = async (webflow) => {
       tags: getTags(testimonial),
     };
   });
-  console.log("@@@", testimonials);
+  // console.log("@@@", testimonials);
   return testimonials;
 };
 
