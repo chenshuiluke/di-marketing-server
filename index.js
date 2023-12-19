@@ -299,7 +299,7 @@ const getProductWebinars = async (webflow) => {
       contentType: "webinar",
       tags: getProductWebinarFeatures(webinar),
       author: webinar?.["ce-credits"],
-      module: "",
+      module: "empty module",
       desiredOutcomes: getProductWebinarDesiredOutcomes(webinar),
     };
     if (webinar?.["module-multiselect"] != null) {
