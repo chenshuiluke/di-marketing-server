@@ -358,7 +358,6 @@ const getBlogs = async (webflow) => {
       author: blog?.author,
     };
   });
-  console.log("@@@", blogs);
   return blogs;
 };
 
