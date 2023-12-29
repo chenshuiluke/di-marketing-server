@@ -241,7 +241,10 @@ const getEbooks = async (webflow) => {
       image: ebook?.thumbnail?.url,
       description: ebook?.description,
       tags: ebook?.["tag-dropdown"],
-      date: ebook?.["updated-on"],
+      date:
+        ebook?.["launch-date"] != null
+          ? ebook?.["launch-date"]
+          : ebook?.["updated-on"],
       link: `/ebooks/${ebook?.slug}`,
       contentType: "ebook",
       tags: getTags(ebook),
