@@ -297,7 +297,7 @@ const getProductWebinars = async (webflow) => {
       image: webinar?.thumbnail?.url,
       description: webinar?.["meta-description"],
       tags: webinar?.["tag-dropdown"],
-      date: webinar?.["created-date"],
+      date: webinar?.["created-date"] || webinar?.["created-on"],
       link: `/product-webinars/${webinar?.slug}`,
       contentType: "webinar",
       tags: getProductWebinarFeatures(webinar),
