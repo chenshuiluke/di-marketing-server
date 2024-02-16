@@ -115,6 +115,7 @@ const collectionIdMap = {
   productWebinar: "6508490b2d27c5402795c54e",
   services: "64bec9d0d9be11ef02b7dab3",
   proofFeatures: "63ec21ad0687773eccfbae38",
+  tools: "65b7e5130431d0de5583e361",
 };
 
 let first6Resources = [];
@@ -252,6 +253,31 @@ const getEbooks = async (webflow) => {
   });
   console.log("@@@", ebooks);
   return ebooks;
+};
+
+const getTools = async (webflow) => {
+  const toolsResponse = await getAllFromCollection(
+    webflow,
+    collectionIdMap.tools
+  );
+  const tools = toolsResponse.map((tool) => {
+    return {
+      id: tool._id,
+      title: tool?.name,
+      image: tool?.thumbnail?.url,
+      description: tool?.description,
+      tags: tool?.["tag-dropdown"],
+      date:
+        tool?.["launch-date"] != null
+          ? tool?.["launch-date"]
+          : tool?.["updated-on"],
+      link: `/tools/${tool?.slug}`,
+      contentType: "tool",
+      tags: getTags(tool),
+    };
+  });
+  console.log("@@@", tools);
+  return tools;
 };
 
 const getWebinars = async (webflow) => {
@@ -406,6 +432,7 @@ const getTestimonials = async (webflow) => {
         "63ec21ad068777049bfbae30", //Webinar
         "63ec21ad0687771dfdfbae37", //Testimonial
         "63ec21ad068777c4effbae34", // Podcast
+        "65b7e5130431d0de5583e361", // Tools
       ];
       const certifiedPartnerServiceTypesCollectionId =
         "64bec9d0d9be11ef02b7dab3";
@@ -492,12 +519,14 @@ const getTestimonials = async (webflow) => {
       const podcasts = await getPodcasts(webflow);
       const testimonials = await getTestimonials(webflow);
       const productWebinars = await getProductWebinars(webflow);
+      const tools = await getTools(webflow);
       const allContent = [
         ...ebooks,
         ...webinars,
         ...blogs,
         ...podcasts,
         ...testimonials,
+        ...tools,
       ];
       const sortedContent = allContent.sort((a, b) => {
         return (
