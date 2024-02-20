@@ -24,7 +24,7 @@ module.exports = {
     let endpoint = "https://api.rebrandly.com/v1/links";
     let linkRequest = {
       destination: req.body.destinationUrl,
-      domain: { fullName: "info.dentalintel.net" },
+      domain: { fullName: "info.dentalintel.com" },
       slashtag: req.body.slashTag,
     };
     const apiCall = {
