@@ -222,6 +222,7 @@ const getCertifiedPartners = async (webflow) => {
       topPerformerCategory: partner?.["top-performer-category"],
       date: partner?.["updated-on"],
       link: `/certified-partners/${partner?.slug}`,
+      order: partner?.["display-order"],
       contentType: "partner",
       services: getServiceTypes(partner),
     };
@@ -467,12 +468,16 @@ const getTestimonials = async (webflow) => {
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
-      goldPartners = certifiedPartners.filter(
-        (partner) => partner.tier === "gold"
-      );
-      diamondPartners = certifiedPartners.filter(
-        (partner) => partner.tier === "diamond"
-      );
+      goldPartners = certifiedPartners
+        .filter((partner) => partner.tier === "gold")
+        .sort((partnerA, partnerB) => {
+          return partnerA.order - partnerB.order;
+        });
+      diamondPartners = certifiedPartners
+        .filter((partner) => partner.tier === "diamond")
+        .sort((partnerA, partnerB) => {
+          return partnerA.order - partnerB.order;
+        });
 
       const tags = await webflow.items({
         collectionId: resourceTagCollectionId,
