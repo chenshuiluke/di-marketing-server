@@ -25,6 +25,7 @@ let serviceTypeList = [];
 let featureList = [];
 let productWebinarList = [];
 let desiredOutcomesList = [];
+let productWebinarNameAndModuleMap = {};
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
@@ -99,6 +100,10 @@ app.get("/api/resources/first-six", async (req, res, next) => {
 
 app.get("/api/product-webinars", async (req, res, next) => {
   return res.json(productWebinarList);
+});
+
+app.get("/api/product-webinars/module", async (req, res, next) => {
+  return res.json(productWebinarNameAndModuleMap[req.query.name]);
 });
 
 app.get("/api/desired-outcomes", async (req, res, next) => {
@@ -337,6 +342,9 @@ const getProductWebinars = async (webflow) => {
         const module = webinarModuleNameMap[moduleId];
         result.module += ` ${module}`;
       }
+      productWebinarNameAndModuleMap[webinar?.name] = result.module;
+    } else {
+      productWebinarNameAndModuleMap[webinar?.name] = null;
     }
     return result;
   });
