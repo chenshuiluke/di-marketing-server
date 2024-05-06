@@ -78,7 +78,12 @@ app.get("/api/tags", async (req, res, next) => {
 });
 
 app.get("/api/resources/", async (req, res, next) => {
-  return res.json(sortedResources);
+  if (req.query.type == null) {
+    return res.json(sortedResources);
+  }
+  return res.json(
+    sortedResources.filter((resource) => resource.contentType == req.query.type)
+  );
 });
 
 app.get("/api/certified-partners/", async (req, res, next) => {
