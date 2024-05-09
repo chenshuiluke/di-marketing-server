@@ -177,6 +177,7 @@ const getDesiredOutcomes = (resource) => {
   }
   return "";
 };
+
 const getPodcastSeries = (resource) => {
   const podcastSeries = resource?.["podcast-series"]
     ?.filter((id) => {
