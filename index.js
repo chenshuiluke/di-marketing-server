@@ -166,6 +166,18 @@ const getProductWebinarFeatures = (resource) => {
   return "";
 };
 
+const getTestimonialFeatures = (resource) => {
+  const features = resource?.["features"]
+    ?.filter((id) => {
+      return featureIdNameMap[id] != null;
+    })
+    .map((id) => featureIdNameMap[id]?.toLowerCase());
+  if (features?.length > 0) {
+    return features.join(" ");
+  }
+  return "";
+};
+
 const getDesiredOutcomes = (resource) => {
   const desiredOutcomes = resource?.["desired-outcomes"]
     ?.filter((id) => {
@@ -453,6 +465,8 @@ const getTestimonials = async (webflow) => {
       link: `/testimonials/${testimonial?.slug}`,
       contentType: "testimonial",
       tags: getTags(testimonial),
+      features: getTestimonialFeatures(testimonial),
+      desiredOutcomes: getDesiredOutcomes(testimonial),
     };
   });
   // console.log("@@@", testimonials);
