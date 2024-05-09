@@ -189,6 +189,19 @@ const getPodcastSeries = (resource) => {
   }
   return "";
 };
+
+const getWebinarSeries = (resource) => {
+  const webinarSeries = resource?.["webinar-series"]
+    ?.filter((id) => {
+      return webinarModuleNameMap[id] != null;
+    })
+    .map((id) => webinarModuleNameMap[id]?.toLowerCase());
+  if (webinarSeries?.length > 0) {
+    return webinarSeries.join(" ");
+  }
+  return "";
+};
+
 const getServiceTypes = (partner) => {
   const tags = partner?.["services"]
     ?.filter((serviceId) => {
@@ -323,6 +336,8 @@ const getWebinars = async (webflow) => {
       contentType: "webinar",
       tags: getTags(webinar),
       author: webinar?.["ce-credits"],
+      desiredOutcomes: getDesiredOutcomes(webinar),
+      webinarSeries: getWebinarSeries(webinar),
     };
   });
   console.log("@@@", webinars);
@@ -472,6 +487,7 @@ const getTestimonials = async (webflow) => {
       const webinarModuleCollectionId = "65539140694b580e20191db8";
       const desiredOutcomeCollectionId = "65805a35ff9d32c0ce857ebc";
       const podcastSeriesCollectionId = "663cfaa2e757890c9cf72288";
+      const webinarSeriesCollectionId = "663d08621b002de213bf35ba";
 
       const serviceTypes = await webflow.items({
         collectionId: certifiedPartnerServiceTypesCollectionId,
@@ -487,6 +503,10 @@ const getTestimonials = async (webflow) => {
 
       const podcastSeriesList = await webflow.items({
         collectionId: podcastSeriesCollectionId,
+      });
+
+      const webinarSeriesList = await webflow.items({
+        collectionId: webinarSeriesCollectionId,
       });
 
       serviceTypeList = [];
@@ -506,6 +526,10 @@ const getTestimonials = async (webflow) => {
 
       for (const podcastSeries of podcastSeriesList) {
         podcastSeriesNameMap[podcastSeries._id] = podcastSeries.name;
+      }
+
+      for (const webinarSeries of webinarSeriesList) {
+        webinarSeriesNameMap[webinarSeries._id] = webinarSeries.name;
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
