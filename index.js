@@ -21,6 +21,8 @@ const featureIdNameMap = {};
 const serviceTypeIdNameMap = {};
 const webinarModuleNameMap = {};
 const desiredOutcomeNameMap = {};
+const podcastSeriesNameMap = {};
+const webinarSeriesNameMap = {};
 let serviceTypeList = [];
 let featureList = [];
 let productWebinarList = [];
@@ -175,7 +177,17 @@ const getDesiredOutcomes = (resource) => {
   }
   return "";
 };
-
+const getPodcastSeries = (resource) => {
+  const podcastSeries = resource?.["podcast-series"]
+    ?.filter((id) => {
+      return podcastSeriesNameMap[id] != null;
+    })
+    .map((id) => podcastSeriesNameMap[id]?.toLowerCase());
+  if (podcastSeries?.length > 0) {
+    return podcastSeries.join(" ");
+  }
+  return "";
+};
 const getServiceTypes = (partner) => {
   const tags = partner?.["services"]
     ?.filter((serviceId) => {
@@ -378,6 +390,8 @@ const getPodcasts = async (webflow) => {
       tags: getTags(podcast),
       author: podcast?.series,
       episode: podcast?.["episode-number"],
+      desiredOutcomes: getDesiredOutcomes(podcast),
+      podcastSeries: getPodcastSeries(podcast),
     };
   });
   console.log("@@@", podcasts);
@@ -456,6 +470,7 @@ const getTestimonials = async (webflow) => {
       const certifiedPartnerCollectionId = "64bec95d1d0799a80325f918";
       const webinarModuleCollectionId = "65539140694b580e20191db8";
       const desiredOutcomeCollectionId = "65805a35ff9d32c0ce857ebc";
+      const podcastSeriesCollectionId = "663cfaa2e757890c9cf72288";
 
       const serviceTypes = await webflow.items({
         collectionId: certifiedPartnerServiceTypesCollectionId,
@@ -468,6 +483,11 @@ const getTestimonials = async (webflow) => {
       const desiredOutcomes = await webflow.items({
         collectionId: desiredOutcomeCollectionId,
       });
+
+      const podcastSeriesList = await webflow.items({
+        collectionId: podcastSeriesCollectionId,
+      });
+
       serviceTypeList = [];
       for (const serviceType of serviceTypes) {
         serviceTypeIdNameMap[serviceType._id] = serviceType.name;
@@ -481,6 +501,10 @@ const getTestimonials = async (webflow) => {
       for (const desiredOutcome of desiredOutcomes) {
         desiredOutcomeNameMap[desiredOutcome._id] = desiredOutcome.name;
         desiredOutcomesList.push(desiredOutcome.name?.toLowerCase());
+      }
+
+      for (const podcastSeries of podcastSeriesList) {
+        podcastSeriesNameMap[podcastSeries._id] = podcastSeries.name;
       }
       const certifiedPartners = await getCertifiedPartners(webflow);
 
