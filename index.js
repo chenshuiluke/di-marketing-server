@@ -164,7 +164,7 @@ const getProductWebinarFeatures = (resource) => {
   return "";
 };
 
-const getProductWebinarDesiredOutcomes = (resource) => {
+const getDesiredOutcomes = (resource) => {
   const desiredOutcomes = resource?.["desired-outcomes"]
     ?.filter((id) => {
       return desiredOutcomeNameMap[id] != null;
@@ -340,7 +340,7 @@ const getProductWebinars = async (webflow) => {
       tags: getProductWebinarFeatures(webinar),
       author: webinar?.["ce-credits"],
       module: "empty module",
-      desiredOutcomes: getProductWebinarDesiredOutcomes(webinar),
+      desiredOutcomes: getDesiredOutcomes(webinar),
     };
     if (webinar?.["module-multiselect"] != null) {
       for (const moduleId of webinar["module-multiselect"]) {
@@ -399,6 +399,7 @@ const getBlogs = async (webflow) => {
       contentType: "blog",
       tags: getTags(blog),
       author: blog?.author,
+      desiredOutcomes: getDesiredOutcomes(blog),
     };
   });
   return blogs;
