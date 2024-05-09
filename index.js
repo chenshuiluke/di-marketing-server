@@ -260,6 +260,7 @@ const getEbooks = async (webflow) => {
       link: `/ebooks/${ebook?.slug}`,
       contentType: "ebook",
       tags: getTags(ebook),
+      desiredOutcomes: getDesiredOutcomes(ebook),
     };
   });
   console.log("@@@", ebooks);
@@ -285,6 +286,7 @@ const getTools = async (webflow) => {
       link: `/tools/${tool?.slug}`,
       contentType: "tool",
       tags: getTags(tool),
+      desiredOutcomes: getDesiredOutcomes(tool),
     };
   });
   console.log("@@@", tools);
