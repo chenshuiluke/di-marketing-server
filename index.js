@@ -203,11 +203,11 @@ const getPodcastSeries = (resource) => {
 };
 
 const getWebinarSeries = (resource) => {
-  const webinarSeries = resource?.["webinar-series"]
+  const webinarSeries = resource?.["webinar-series-new"]
     ?.filter((id) => {
-      return webinarModuleNameMap[id] != null;
+      return webinarSeriesNameMap[id] != null;
     })
-    .map((id) => webinarModuleNameMap[id]?.toLowerCase());
+    .map((id) => webinarSeriesNameMap[id]?.toLowerCase());
   if (webinarSeries?.length > 0) {
     return webinarSeries.join(" ");
   }
