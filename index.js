@@ -461,7 +461,7 @@ const getTestimonials = async (webflow) => {
       image: testimonial?.thumbnail?.url,
       description: testimonial?.["quote"],
       tags: testimonial?.["tag-dropdown"],
-      date: testimonial?.["updated-on"],
+      date: testimonial?.["created-on"],
       link: `/testimonials/${testimonial?.slug}`,
       contentType: "testimonial",
       tags: getTags(testimonial),
