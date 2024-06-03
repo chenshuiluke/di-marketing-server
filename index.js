@@ -23,6 +23,7 @@ const webinarModuleNameMap = {};
 const desiredOutcomeNameMap = {};
 const podcastSeriesNameMap = {};
 const webinarSeriesNameMap = {};
+const demoEmailMap = {};
 let serviceTypeList = [];
 let featureList = [];
 let productWebinarList = [];
@@ -115,6 +116,36 @@ app.get("/api/product-webinars/module", async (req, res, next) => {
 
 app.get("/api/desired-outcomes", async (req, res, next) => {
   return res.json(desiredOutcomesList);
+});
+
+app.post("/api/check-demo-email", async (req, res, next) => {
+  try {
+    let email = req.body.email;
+    if (email != null) {
+      email = email.toLowerCase();
+      const existingRecord = demoEmailMap[email];
+      if (existingRecord == null) {
+        demoEmailMap[email] = {
+          numberOfSubmissions: 1,
+          firstSubmissionDate: moment(),
+        };
+      } else {
+        let hours = moment().diff(existingRecord.firstSubmissionDate, "hours");
+        if (hours >= 72) {
+          existingRecord.numberOfSubmissions = 0;
+          existingRecord.firstSubmissionDate = moment();
+        }
+        if (existingRecord.numberOfSubmissions < 5) {
+          existingRecord.numberOfSubmissions += 1;
+        } else {
+          return res.status(400).end();
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  res.end();
 });
 
 const collectionIdMap = {
