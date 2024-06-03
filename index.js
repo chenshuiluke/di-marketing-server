@@ -131,7 +131,7 @@ app.post("/api/check-demo-email", async (req, res, next) => {
         };
       } else {
         let hours = moment().diff(existingRecord.firstSubmissionDate, "hours");
-        if (hours >= 1) {
+        if (hours >= 72) {
           existingRecord.numberOfSubmissions = 0;
           existingRecord.firstSubmissionDate = moment();
         }
