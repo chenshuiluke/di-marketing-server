@@ -138,14 +138,14 @@ app.post("/api/check-demo-email", async (req, res, next) => {
         if (existingRecord.numberOfSubmissions < 5) {
           existingRecord.numberOfSubmissions += 1;
         } else {
-          return res.status(400).end();
+          return res.status(400).end({});
         }
       }
     }
   } catch (err) {
     console.error(err);
   }
-  res.end();
+  res.json({});
 });
 
 const collectionIdMap = {
