@@ -499,6 +499,7 @@ const getTestimonials = async (webflow) => {
       tags: getTags(testimonial),
       features: getTestimonialFeatures(testimonial),
       desiredOutcomes: getDesiredOutcomes(testimonial),
+      doNotShowDateInCard: true,
     };
   });
   // console.log("@@@", testimonials);
