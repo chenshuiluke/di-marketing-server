@@ -495,6 +495,7 @@ const getTestimonials = async (webflow) => {
       date: testimonial?.["created-on"],
       link: `/testimonials/${testimonial?.slug}`,
       contentType: "testimonial",
+      author: testimonial?.["author"],
       tags: getTags(testimonial),
       features: getTestimonialFeatures(testimonial),
       desiredOutcomes: getDesiredOutcomes(testimonial),
