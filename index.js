@@ -581,7 +581,9 @@ const getTestimonials = async (webflow) => {
       const certifiedPartners = await getCertifiedPartners(webflow);
 
       goldPartners = certifiedPartners
-        .filter((partner) => partner.tier === "gold")
+        .filter(
+          (partner) => partner.tier === "gold" || partner.tier === "silver"
+        )
         .sort((partnerA, partnerB) => {
           return partnerA.order - partnerB.order;
         });
