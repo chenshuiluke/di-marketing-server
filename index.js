@@ -266,6 +266,7 @@ const getTier = (partner) => {
   if (partner?.["partner-tier"] == diamondTierId) {
     return "diamond";
   }
+  return "silver";
 };
 
 const getAllFromCollection = async (webflow, collectionId) => {
