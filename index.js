@@ -489,181 +489,184 @@ const getTestimonials = async (webflow) => {
 };
 
 (async () => {
-  // setIntervalAsync(async () => {
-  try {
-    const apiKey = process.env.API_KEY_V2;
-    const siteId = "6266d8ef8c92b1230d1e0cbb";
-    const webflow = new WebflowClient({ accessToken: apiKey });
+  setIntervalAsync(async () => {
+    try {
+      const apiKey = process.env.API_KEY_V2;
+      const siteId = "6266d8ef8c92b1230d1e0cbb";
+      const webflow = new WebflowClient({ accessToken: apiKey });
 
-    const resourceTagCollectionId = "63ec21ad068777b053fbae35";
+      const resourceTagCollectionId = "63ec21ad068777b053fbae35";
 
-    const collectionsResponse = await webflow.collections.list(siteId);
-    const collections = collectionsResponse;
+      const collectionsResponse = await webflow.collections.list(siteId);
+      const collections = collectionsResponse;
 
-    console.log(collections);
+      console.log(collections);
 
-    const collectionIds = [
-      "63ec21ad0687778cfffbae36", // Ebook
-      "63ec21ad068777fbe9fbae33", // Blog
-      "63ec21ad068777049bfbae30", // Webinar
-      "63ec21ad0687771dfdfbae37", // Testimonial
-      "63ec21ad068777c4effbae34", // Podcast
-      "65b7e5130431d0de5583e361", // Tools
-    ];
-    const certifiedPartnerServiceTypesCollectionId = "64bec9d0d9be11ef02b7dab3";
-    const webinarModuleCollectionId = "65539140694b580e20191db8";
-    const desiredOutcomeCollectionId = "65805a35ff9d32c0ce857ebc";
-    const podcastSeriesCollectionId = "663cfaa2e757890c9cf72288";
-    const webinarSeriesCollectionId = "663d08621b002de213bf35ba";
+      const collectionIds = [
+        "63ec21ad0687778cfffbae36", // Ebook
+        "63ec21ad068777fbe9fbae33", // Blog
+        "63ec21ad068777049bfbae30", // Webinar
+        "63ec21ad0687771dfdfbae37", // Testimonial
+        "63ec21ad068777c4effbae34", // Podcast
+        "65b7e5130431d0de5583e361", // Tools
+      ];
+      const certifiedPartnerServiceTypesCollectionId =
+        "64bec9d0d9be11ef02b7dab3";
+      const webinarModuleCollectionId = "65539140694b580e20191db8";
+      const desiredOutcomeCollectionId = "65805a35ff9d32c0ce857ebc";
+      const podcastSeriesCollectionId = "663cfaa2e757890c9cf72288";
+      const webinarSeriesCollectionId = "663d08621b002de213bf35ba";
 
-    const serviceTypesResponse = await getAllFromCollection(
-      webflow,
-      certifiedPartnerServiceTypesCollectionId
-    );
-    const webinarModuleMultiselectResponse = await getAllFromCollection(
-      webflow,
-      webinarModuleCollectionId
-    );
-    const desiredOutcomesResponse = await getAllFromCollection(
-      webflow,
-      desiredOutcomeCollectionId
-    );
-    const podcastSeriesResponse = await getAllFromCollection(
-      webflow,
-      podcastSeriesCollectionId
-    );
-    const webinarSeriesResponse = await getAllFromCollection(
-      webflow,
-      webinarSeriesCollectionId
-    );
+      const serviceTypesResponse = await getAllFromCollection(
+        webflow,
+        certifiedPartnerServiceTypesCollectionId
+      );
+      const webinarModuleMultiselectResponse = await getAllFromCollection(
+        webflow,
+        webinarModuleCollectionId
+      );
+      const desiredOutcomesResponse = await getAllFromCollection(
+        webflow,
+        desiredOutcomeCollectionId
+      );
+      const podcastSeriesResponse = await getAllFromCollection(
+        webflow,
+        podcastSeriesCollectionId
+      );
+      const webinarSeriesResponse = await getAllFromCollection(
+        webflow,
+        webinarSeriesCollectionId
+      );
 
-    const serviceTypes = serviceTypesResponse;
-    const webinarModuleMultiselect = webinarModuleMultiselectResponse;
-    const desiredOutcomes = desiredOutcomesResponse;
-    const podcastSeriesList = podcastSeriesResponse;
-    const webinarSeriesList = webinarSeriesResponse;
+      const serviceTypes = serviceTypesResponse;
+      const webinarModuleMultiselect = webinarModuleMultiselectResponse;
+      const desiredOutcomes = desiredOutcomesResponse;
+      const podcastSeriesList = podcastSeriesResponse;
+      const webinarSeriesList = webinarSeriesResponse;
 
-    serviceTypeList = [];
-    for (const serviceType of serviceTypes) {
-      serviceTypeIdNameMap[serviceType._id] = serviceType.name;
-      serviceTypeList.push(serviceType.name);
-    }
+      serviceTypeList = [];
+      for (const serviceType of serviceTypes) {
+        serviceTypeIdNameMap[serviceType._id] = serviceType.name;
+        serviceTypeList.push(serviceType.name);
+      }
 
-    for (const webinarModule of webinarModuleMultiselect) {
-      webinarModuleNameMap[webinarModule._id] = webinarModule.name;
-    }
-    desiredOutcomesList = [];
-    for (const desiredOutcome of desiredOutcomes) {
-      desiredOutcomeNameMap[desiredOutcome._id] = desiredOutcome.name;
-      desiredOutcomesList.push(desiredOutcome.name?.toLowerCase());
-    }
+      for (const webinarModule of webinarModuleMultiselect) {
+        webinarModuleNameMap[webinarModule._id] = webinarModule.name;
+      }
+      desiredOutcomesList = [];
+      for (const desiredOutcome of desiredOutcomes) {
+        desiredOutcomeNameMap[desiredOutcome._id] = desiredOutcome.name;
+        desiredOutcomesList.push(desiredOutcome.name?.toLowerCase());
+      }
 
-    for (const podcastSeries of podcastSeriesList) {
-      podcastSeriesNameMap[podcastSeries._id] = podcastSeries.name;
-    }
+      for (const podcastSeries of podcastSeriesList) {
+        podcastSeriesNameMap[podcastSeries._id] = podcastSeries.name;
+      }
 
-    for (const webinarSeries of webinarSeriesList) {
-      webinarSeriesNameMap[webinarSeries._id] = webinarSeries.name;
-    }
-    const certifiedPartners = await getCertifiedPartners(webflow);
+      for (const webinarSeries of webinarSeriesList) {
+        webinarSeriesNameMap[webinarSeries._id] = webinarSeries.name;
+      }
+      const certifiedPartners = await getCertifiedPartners(webflow);
 
-    goldPartners = certifiedPartners
-      .filter((partner) => partner.tier === "gold" || partner.tier === "silver")
-      .sort((partnerA, partnerB) => {
-        return partnerA.order - partnerB.order;
-      });
-    diamondPartners = certifiedPartners
-      .filter((partner) => partner.tier === "diamond")
-      .sort((partnerA, partnerB) => {
-        return partnerA.order - partnerB.order;
-      });
+      goldPartners = certifiedPartners
+        .filter(
+          (partner) => partner.tier === "gold" || partner.tier === "silver"
+        )
+        .sort((partnerA, partnerB) => {
+          return partnerA.order - partnerB.order;
+        });
+      diamondPartners = certifiedPartners
+        .filter((partner) => partner.tier === "diamond")
+        .sort((partnerA, partnerB) => {
+          return partnerA.order - partnerB.order;
+        });
 
-    const tagsResponse = await getAllFromCollection(
-      webflow,
-      resourceTagCollectionId
-    );
-    const tags = tagsResponse;
+      const tagsResponse = await getAllFromCollection(
+        webflow,
+        resourceTagCollectionId
+      );
+      const tags = tagsResponse;
 
-    for (const tag of tags) {
-      tagIdNameMap[tag._id] = tag.name;
-    }
+      for (const tag of tags) {
+        tagIdNameMap[tag._id] = tag.name;
+      }
 
-    const featuresResponse = await getAllFromCollection(
-      webflow,
-      collectionIdMap.proofFeatures
-    );
-    const features = featuresResponse;
-    featureList = [];
-    for (const feature of features) {
-      featureIdNameMap[feature._id] = feature.name;
-      featureList.push(feature);
-    }
-    for (const collectionId of collectionIds) {
-      const itemsResponse = await getAllFromCollection(webflow, collectionId);
-      const items = itemsResponse;
-      for (const item of items) {
-        if (item?.name?.includes("3")) {
-          console.log("@@@ item", item);
-        }
+      const featuresResponse = await getAllFromCollection(
+        webflow,
+        collectionIdMap.proofFeatures
+      );
+      const features = featuresResponse;
+      featureList = [];
+      for (const feature of features) {
+        featureIdNameMap[feature._id] = feature.name;
+        featureList.push(feature);
+      }
+      for (const collectionId of collectionIds) {
+        const itemsResponse = await getAllFromCollection(webflow, collectionId);
+        const items = itemsResponse;
+        for (const item of items) {
+          if (item?.name?.includes("3")) {
+            console.log("@@@ item", item);
+          }
 
-        if (
-          item != null &&
-          item["tag-dropdown"] != null &&
-          Array.isArray(item["tag-dropdown"])
-        ) {
-          tagMap[item.name.trim()] = item["tag-dropdown"].map((tagId) => {
-            return tagIdNameMap[tagId];
-          });
+          if (
+            item != null &&
+            item["tag-dropdown"] != null &&
+            Array.isArray(item["tag-dropdown"])
+          ) {
+            tagMap[item.name.trim()] = item["tag-dropdown"].map((tagId) => {
+              return tagIdNameMap[tagId];
+            });
+          }
         }
       }
-    }
-    console.log(tagMap);
+      console.log(tagMap);
 
-    const ebooks = await getEbooks(webflow);
-    const webinars = await getWebinars(webflow);
-    const blogs = await getBlogs(webflow);
-    const podcasts = await getPodcasts(webflow);
-    const testimonials = await getTestimonials(webflow);
-    const productWebinars = await getProductWebinars(webflow);
-    const tools = await getTools(webflow);
-    const allContent = [
-      ...ebooks,
-      ...webinars,
-      ...blogs,
-      ...podcasts,
-      ...testimonials,
-      ...tools,
-    ];
-    const sortedContent = allContent.sort((a, b) => {
-      return (
-        moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
-      );
-    });
-    sortedResources = sortedContent.map((record) => {
-      return {
-        ...record,
-        ...(record?.date != null && {
-          date: moment(record.date).format("MMM D, YYYY"),
-        }),
-      };
-    });
-    const sortedProductWebinars = productWebinars.sort((a, b) => {
-      return (
-        moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
-      );
-    });
-    productWebinarList = sortedProductWebinars.map((record) => {
-      return {
-        ...record,
-        ...(record?.date != null && {
-          date: moment(record.date).format("MMM D, YYYY"),
-        }),
-      };
-    });
-    first6Resources = sortedResources.slice(0, 6);
-  } catch (e) {
-    // Handle errors
-    console.error(e);
-  }
-  // }, 60000);
+      const ebooks = await getEbooks(webflow);
+      const webinars = await getWebinars(webflow);
+      const blogs = await getBlogs(webflow);
+      const podcasts = await getPodcasts(webflow);
+      const testimonials = await getTestimonials(webflow);
+      const productWebinars = await getProductWebinars(webflow);
+      const tools = await getTools(webflow);
+      const allContent = [
+        ...ebooks,
+        ...webinars,
+        ...blogs,
+        ...podcasts,
+        ...testimonials,
+        ...tools,
+      ];
+      const sortedContent = allContent.sort((a, b) => {
+        return (
+          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
+        );
+      });
+      sortedResources = sortedContent.map((record) => {
+        return {
+          ...record,
+          ...(record?.date != null && {
+            date: moment(record.date).format("MMM D, YYYY"),
+          }),
+        };
+      });
+      const sortedProductWebinars = productWebinars.sort((a, b) => {
+        return (
+          moment(b.date).format("YYYYMMDD") - moment(a.date).format("YYYYMMDD")
+        );
+      });
+      productWebinarList = sortedProductWebinars.map((record) => {
+        return {
+          ...record,
+          ...(record?.date != null && {
+            date: moment(record.date).format("MMM D, YYYY"),
+          }),
+        };
+      });
+      first6Resources = sortedResources.slice(0, 6);
+    } catch (e) {
+      // Handle errors
+      console.error(e);
+    }
+  }, 60000);
 })();
