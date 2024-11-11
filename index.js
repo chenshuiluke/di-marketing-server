@@ -271,7 +271,7 @@ const getAllFromCollection = async (webflow, collectionId) => {
   }
 
   return allItems.filter((item) => {
-    return !item._archived && !item._draft;
+    return !item.isArchived && !item.isDraft;
   });
 };
 
@@ -290,7 +290,7 @@ const getCertifiedPartners = async (webflow) => {
       isTopPerformer: partner?.["is-top-performer"],
       partnerWebsite: partner?.["partner-website"],
       topPerformerCategory: partner?.["top-performer-category"],
-      date: partner?.["updated-on"],
+      date: partner?.["lastUpdated"],
       link: `/certified-partners/${partner?.slug}`,
       order: partner?.["display-order"],
       contentType: "partner",
@@ -316,7 +316,7 @@ const getEbooks = async (webflow) => {
       date:
         ebook?.["launch-date"] != null
           ? ebook?.["launch-date"]
-          : ebook?.["updated-on"],
+          : ebook?.["lastUpdated"],
       link: `/ebooks/${ebook?.slug}`,
       contentType: "ebook",
       tags: getTags(ebook),
@@ -342,7 +342,7 @@ const getTools = async (webflow) => {
       date:
         tool?.["launch-date"] != null
           ? tool?.["launch-date"]
-          : tool?.["updated-on"],
+          : tool?.["lastUpdated"],
       link: `/tools/${tool?.slug}`,
       contentType: "tool",
       tags: getTags(tool),
