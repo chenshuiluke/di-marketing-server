@@ -8,8 +8,8 @@ const urlBuilder = require("./controllers/url-builder");
 const partnerCreation = require("./controllers/partner_creation");
 const snapshot = require("./controllers/snapshot");
 const referral = require("./controllers/referral");
-const { setIntervalAsync, clearIntervalAsync } = require("set-interval-async");
-const Webflow = require("webflow-api");
+const { setIntervalAsync } = require("set-interval-async");
+const { WebflowClient } = require("webflow-api");
 const moment = require("moment");
 app.use(express.json());
 app.use(cors());
@@ -29,33 +29,11 @@ let featureList = [];
 let productWebinarList = [];
 let desiredOutcomesList = [];
 let productWebinarNameAndModuleMap = {};
+
 mongoose
   .connect(dbURI)
-  .then((result) => app.listen(port, () => console.log(`Listening on ${port}`)))
+  .then(() => app.listen(port, () => console.log(`Listening on ${port}`)))
   .catch((err) => console.error(err));
-
-// var conn = new jsforce.Connection({
-//   // you can change loginUrl to connect to sandbox or prerelease env.
-//   loginUrl: "https://login.salesforce.com/",
-// });
-
-// conn.login(
-//   process.env.SF_USERNAME,
-//   process.env.SF_PASSWORD,
-//   function (err, userInfo) {
-//     if (err) {
-//       return console.error(err);
-//     }
-//     // Now you can get the access token and instance URL information.
-//     // Save them to establish connection next time.
-//     // console.log(conn.accessToken);
-//     // console.log(conn.instanceUrl);
-//     // // logged in user property
-//     // console.log("User ID: " + userInfo.id);
-//     // console.log("Org ID: " + userInfo.organizationId);
-//     // ...
-//   }
-// );
 
 // MARKETING URL BUILDER
 app.post("/api/shortenUrl", urlBuilder.createMarketingUrl);
@@ -76,11 +54,11 @@ app.get("/api/getLinks", urlBuilder.getAllLinks);
 // CUSTOMER REFERRAL ROUTES
 app.get("/api/createReferralLink", referral.createReferralLink);
 
-app.get("/api/tags", async (req, res, next) => {
+app.get("/api/tags", async (req, res) => {
   return res.json(tagMap);
 });
 
-app.get("/api/resources/", async (req, res, next) => {
+app.get("/api/resources/", async (req, res) => {
   if (req.query.type == null) {
     return res.json(sortedResources);
   }
@@ -89,36 +67,36 @@ app.get("/api/resources/", async (req, res, next) => {
   );
 });
 
-app.get("/api/certified-partners/", async (req, res, next) => {
+app.get("/api/certified-partners/", async (req, res) => {
   return res.json({
     goldPartners,
     diamondPartners,
   });
 });
 
-app.get("/api/certified-partners/service-types", async (req, res, next) => {
+app.get("/api/certified-partners/service-types", async (req, res) => {
   return res.json({
     serviceTypes: serviceTypeList,
   });
 });
 
-app.get("/api/resources/first-six", async (req, res, next) => {
+app.get("/api/resources/first-six", async (req, res) => {
   return res.json(first6Resources);
 });
 
-app.get("/api/product-webinars", async (req, res, next) => {
+app.get("/api/product-webinars", async (req, res) => {
   return res.json(productWebinarList);
 });
 
-app.get("/api/product-webinars/module", async (req, res, next) => {
+app.get("/api/product-webinars/module", async (req, res) => {
   return res.json(productWebinarNameAndModuleMap[req.query.name]);
 });
 
-app.get("/api/desired-outcomes", async (req, res, next) => {
+app.get("/api/desired-outcomes", async (req, res) => {
   return res.json(desiredOutcomesList);
 });
 
-app.post("/api/check-demo-email", async (req, res, next) => {
+app.post("/api/check-demo-email", async (req, res) => {
   try {
     let email = req.body.email;
     if (email != null) {
@@ -271,17 +249,29 @@ const getTier = (partner) => {
 
 const getAllFromCollection = async (webflow, collectionId) => {
   let allItems = [];
-  let latestItems = [];
   let offset = 0;
-  let limit = 100;
-  do {
-    const responseItems = await webflow.items({ collectionId, limit, offset });
-    latestItems = responseItems;
-    allItems = allItems.concat(latestItems);
-    offset += latestItems.length;
-  } while (latestItems.length != 0);
+  const limit = 100; // Webflow API limit per request
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await webflow.collections.items.listItems(collectionId, {
+      limit,
+      offset,
+    });
+    const items = response.items.map((item) => {
+      return {
+        ...item,
+        _id: item.id,
+        ...item.fieldData,
+      };
+    });
+    allItems = allItems.concat(items);
+    offset += items.length;
+    hasMore = items.length === limit;
+  }
+
   return allItems.filter((item) => {
-    return !item._archived && !item._draft;
+    return !item.isArchived && !item.isDraft;
   });
 };
 
@@ -300,7 +290,7 @@ const getCertifiedPartners = async (webflow) => {
       isTopPerformer: partner?.["is-top-performer"],
       partnerWebsite: partner?.["partner-website"],
       topPerformerCategory: partner?.["top-performer-category"],
-      date: partner?.["updated-on"],
+      date: partner?.["lastUpdated"],
       link: `/certified-partners/${partner?.slug}`,
       order: partner?.["display-order"],
       contentType: "partner",
@@ -326,7 +316,7 @@ const getEbooks = async (webflow) => {
       date:
         ebook?.["launch-date"] != null
           ? ebook?.["launch-date"]
-          : ebook?.["updated-on"],
+          : ebook?.["lastUpdated"],
       link: `/ebooks/${ebook?.slug}`,
       contentType: "ebook",
       tags: getTags(ebook),
@@ -352,7 +342,7 @@ const getTools = async (webflow) => {
       date:
         tool?.["launch-date"] != null
           ? tool?.["launch-date"]
-          : tool?.["updated-on"],
+          : tool?.["lastUpdated"],
       link: `/tools/${tool?.slug}`,
       contentType: "tool",
       tags: getTags(tool),
@@ -394,14 +384,7 @@ const getProductWebinars = async (webflow) => {
     collectionIdMap.productWebinar
   );
 
-  const webinars = webinarsResponse.map(async (webinar) => {
-    const moduleIdMap = {
-      "8a06ae32566bcc0d84489c27a5e92f82": "insurance",
-      caf5fd2abdc15a2a8a450a055a17049b: "monthly product webinars",
-      fa5dd3b71d7fc53ee12aea90b49aa256: "localmed",
-      "5cdce68b9bd6d3973075188dc4fb7b0c": "analytics",
-      "46ba10a9bac64b7e99d5ca81fc8ec534": "engagement",
-    };
+  const webinars = webinarsResponse.map((webinar) => {
     const result = {
       id: webinar._id,
       title: webinar?.name,
@@ -413,23 +396,22 @@ const getProductWebinars = async (webflow) => {
       contentType: "webinar",
       tags: getProductWebinarFeatures(webinar),
       author: webinar?.["ce-credits"],
-      module: "empty module",
+      module: "",
       desiredOutcomes: getDesiredOutcomes(webinar),
     };
     if (webinar?.["module-multiselect"] != null) {
-      for (const moduleId of webinar["module-multiselect"]) {
-        const module = webinarModuleNameMap[moduleId];
-        result.module += ` ${module}`;
-      }
+      const modules = webinar["module-multiselect"].map((moduleId) => {
+        return webinarModuleNameMap[moduleId];
+      });
+      result.module = modules.join(" ");
       productWebinarNameAndModuleMap[webinar?.name] = result.module;
     } else {
       productWebinarNameAndModuleMap[webinar?.name] = null;
     }
     return result;
   });
-  const results = await Promise.all(webinars);
-  console.log("@@@ product webinars", results);
-  return results;
+  console.log("@@@ product webinars", webinars);
+  return webinars;
 };
 
 const getPodcasts = async (webflow) => {
@@ -503,59 +485,64 @@ const getTestimonials = async (webflow) => {
       doNotShowDateInCard: true,
     };
   });
-  // console.log("@@@", testimonials);
   return testimonials;
 };
 
 (async () => {
   setIntervalAsync(async () => {
     try {
-      const apiKey = process.env.API_KEY;
+      const apiKey = process.env.API_KEY_V2;
       const siteId = "6266d8ef8c92b1230d1e0cbb";
-      const webflow = new Webflow({ token: apiKey });
+      const webflow = new WebflowClient({ accessToken: apiKey });
 
       const resourceTagCollectionId = "63ec21ad068777b053fbae35";
-      const site = await webflow.site({
-        siteId: siteId,
-      });
-      const collections = await site.collections();
+
+      const collectionsResponse = await webflow.collections.list(siteId);
+      const collections = collectionsResponse;
+
       console.log(collections);
-      // process.exit(0);
+
       const collectionIds = [
         "63ec21ad0687778cfffbae36", // Ebook
-        "63ec21ad068777fbe9fbae33", //Blog
-        "63ec21ad068777049bfbae30", //Webinar
-        "63ec21ad0687771dfdfbae37", //Testimonial
+        "63ec21ad068777fbe9fbae33", // Blog
+        "63ec21ad068777049bfbae30", // Webinar
+        "63ec21ad0687771dfdfbae37", // Testimonial
         "63ec21ad068777c4effbae34", // Podcast
         "65b7e5130431d0de5583e361", // Tools
       ];
       const certifiedPartnerServiceTypesCollectionId =
         "64bec9d0d9be11ef02b7dab3";
-      const certifiedPartnerCollectionId = "64bec95d1d0799a80325f918";
       const webinarModuleCollectionId = "65539140694b580e20191db8";
       const desiredOutcomeCollectionId = "65805a35ff9d32c0ce857ebc";
       const podcastSeriesCollectionId = "663cfaa2e757890c9cf72288";
       const webinarSeriesCollectionId = "663d08621b002de213bf35ba";
 
-      const serviceTypes = await webflow.items({
-        collectionId: certifiedPartnerServiceTypesCollectionId,
-      });
+      const serviceTypesResponse = await getAllFromCollection(
+        webflow,
+        certifiedPartnerServiceTypesCollectionId
+      );
+      const webinarModuleMultiselectResponse = await getAllFromCollection(
+        webflow,
+        webinarModuleCollectionId
+      );
+      const desiredOutcomesResponse = await getAllFromCollection(
+        webflow,
+        desiredOutcomeCollectionId
+      );
+      const podcastSeriesResponse = await getAllFromCollection(
+        webflow,
+        podcastSeriesCollectionId
+      );
+      const webinarSeriesResponse = await getAllFromCollection(
+        webflow,
+        webinarSeriesCollectionId
+      );
 
-      const webinarModuleMultiselect = await webflow.items({
-        collectionId: webinarModuleCollectionId,
-      });
-
-      const desiredOutcomes = await webflow.items({
-        collectionId: desiredOutcomeCollectionId,
-      });
-
-      const podcastSeriesList = await webflow.items({
-        collectionId: podcastSeriesCollectionId,
-      });
-
-      const webinarSeriesList = await webflow.items({
-        collectionId: webinarSeriesCollectionId,
-      });
+      const serviceTypes = serviceTypesResponse;
+      const webinarModuleMultiselect = webinarModuleMultiselectResponse;
+      const desiredOutcomes = desiredOutcomesResponse;
+      const podcastSeriesList = podcastSeriesResponse;
+      const webinarSeriesList = webinarSeriesResponse;
 
       serviceTypeList = [];
       for (const serviceType of serviceTypes) {
@@ -594,27 +581,29 @@ const getTestimonials = async (webflow) => {
           return partnerA.order - partnerB.order;
         });
 
-      const tags = await webflow.items({
-        collectionId: resourceTagCollectionId,
-      });
+      const tagsResponse = await getAllFromCollection(
+        webflow,
+        resourceTagCollectionId
+      );
+      const tags = tagsResponse;
 
       for (const tag of tags) {
         tagIdNameMap[tag._id] = tag.name;
       }
 
-      const features = await webflow.items({
-        collectionId: collectionIdMap.proofFeatures,
-      });
+      const featuresResponse = await getAllFromCollection(
+        webflow,
+        collectionIdMap.proofFeatures
+      );
+      const features = featuresResponse;
       featureList = [];
       for (const feature of features) {
         featureIdNameMap[feature._id] = feature.name;
         featureList.push(feature);
       }
       for (const collectionId of collectionIds) {
-        const items = await webflow.items({
-          collectionId: collectionId,
-        });
-        // console.log(items);
+        const itemsResponse = await getAllFromCollection(webflow, collectionId);
+        const items = itemsResponse;
         for (const item of items) {
           if (item?.name?.includes("3")) {
             console.log("@@@ item", item);
@@ -676,9 +665,8 @@ const getTestimonials = async (webflow) => {
       });
       first6Resources = sortedResources.slice(0, 6);
     } catch (e) {
-      // Deal with the fact the chain failed
+      // Handle errors
       console.error(e);
     }
   }, 60000);
-  // `text` is not available here
 })();
