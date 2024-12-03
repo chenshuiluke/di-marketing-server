@@ -499,9 +499,6 @@ const getTestimonials = async (webflow) => {
 
       const collectionsResponse = await webflow.collections.list(siteId);
       const collections = collectionsResponse;
-
-      console.log(collections);
-
       const collectionIds = [
         "63ec21ad0687778cfffbae36", // Ebook
         "63ec21ad068777fbe9fbae33", // Blog
