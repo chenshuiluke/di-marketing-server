@@ -487,7 +487,7 @@ const getTestimonials = async (webflow) => {
   });
   return testimonials;
 };
-// Runs every 10 mins
+// Runs every 10 minutes
 (async () => {
   setIntervalAsync(async () => {
     try {
