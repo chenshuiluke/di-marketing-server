@@ -665,5 +665,5 @@ const getTestimonials = async (webflow) => {
       // Handle errors
       console.error(e);
     }
-  }, 60000);
+  }, 600000);
 })();
